@@ -1,17 +1,20 @@
 import time
 import serial
 
-PORT = '/dev/ttyACM0'
+PORTS = ['/dev/ttyACM0','/dev/ttyACM1']
 
 class ArduinoBridge(object):
     def __init__(self):
-        self.port = serial.Serial(PORT,115200)
+        for port in PORTS:
+            try:
+                print 'connecting to', port
+                self.port = serial.Serial(port,115200)
+            except:
+                print 'failed to connect'
+                continue
+            break
 
-    def reset():
-    	self.port.write(char(0xFE))
-    	time.sleep(0.1)
-
-    def write(self,updates,elapsed=0):
+    def write(self,updates,elapsed=0): 
 	out = []
 	for w in updates:
     	    next = [
@@ -28,5 +31,5 @@ class ArduinoBridge(object):
         t0 = time.time()
         self.port.write(''.join(map(chr,out)))
         self.port.write(chr(0xFF))
-        sleep_time = 0.010
+        sleep_time = 0.015
         time.sleep(sleep_time)

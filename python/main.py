@@ -27,7 +27,6 @@ def run():
 				c.set_visualization(v)
 			else:
 				c.set_visualization(s)
-		# print 'tick'
 		c.tick()
 
 

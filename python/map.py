@@ -38,7 +38,8 @@ class MapController(object):
 		self.last_state = state
 		try:
 			self.board.write(writes,time.time() - t0)
-		except:
+		except Exception, e:
+			print e
 			self.board_okay = False
 		if delay > 0:
 			time.sleep(delay)

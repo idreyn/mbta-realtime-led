@@ -2,7 +2,7 @@ import math
 import random
 import mbta
 import time
-import timeit
+import threading
 import util
 
 from color import adjust_brightness
@@ -116,6 +116,7 @@ class MapRoute(object):
 		self.last_train_locations = {}
 		self.train_velocities = {}
 		self.last_locate_time = time.time()
+		self.update_lock = threading.Lock()
 		self.segments = map(
 			lambda m: LightSegment(*m),
 			ROUTE_SEGMENTS[name]
@@ -159,13 +160,17 @@ class MapRoute(object):
 			return (None,None)
 
 	def update_trains(self):
-		self.trains = {}
+		trains = {}
 		for t in self.route.get_trains():
-			self.trains[t.id] = t
+			trains[t.id] = t
+		self.update_lock.acquire()
+		self.trains = trains
 		self.locate_trains()
+		self.update_lock.release()
 
 	def nb_update_trains(self):
-		pass
+		update = threading.Thread(target=self.update_trains)
+		update.start()
 
 	def locate_trains(self,as_dict=False):
 		res_dict = {}
@@ -303,8 +308,8 @@ class BlinkRouteMapState(RouteMapState):
 			super(BlinkRouteMapState,self).__init__(routes,tick,should_update)
 			for name, mr in routes.iteritems():
 				if should_update:
-					mr.update_trains()
-					mr.locate_trains()
+					mr.nb_update_trains()
+				mr.update_lock.acquire()
 				for train_id in mr.train_locations:
 					location = int(mr.train_locations[train_id])
 					strip, ind = mr.strip_by_index(location)
@@ -313,6 +318,7 @@ class BlinkRouteMapState(RouteMapState):
 						max(0.1,abs(math.cos(0.1 * (tick - ind))))
 					)
 					self.set_light_color(strip,ind,color)
+				mr.update_lock.release()
 
 class TranserStationState(MapState):
 	def __init__(self,routes):

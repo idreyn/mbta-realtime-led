@@ -8,7 +8,7 @@ from util import *
 
 
 class APIRequest(object):
-	API_KEY = read('../API_KEY.txt')
+	API_KEY = read('../API_KEY.txt').strip()
 
 	@staticmethod
 	def make_request(method,parameters=None):

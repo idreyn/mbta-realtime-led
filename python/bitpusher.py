@@ -6,6 +6,7 @@ PORT = '/dev/cu.usbmodem1411'
 class ArduinoBridge(object):
 	def __init__(self):
 		self.port = serial.Serial(PORT,115200)
+
 	def reset():
 		self.port.write(char(0xFE))
 		time.sleep(0.1)
@@ -27,4 +28,4 @@ class ArduinoBridge(object):
 		for o in out:
 			self.port.write(chr(o))
 		self.port.write(chr(0xFF))
-		time.sleep(0.08)
+		time.sleep(0.075)

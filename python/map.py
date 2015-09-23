@@ -2,7 +2,7 @@ import math
 import random
 import mbta
 import time
-import timeit
+import threading
 import util
 
 from color import adjust_brightness
@@ -12,16 +12,17 @@ from util import *
 from bitpusher import *
 
 class MapController(object):
-	def __init__(self,board=None):
-		self.last_state = MapState()
-		self.board = board
+	def __init__(self):
+		self.reset_board()
 		self.steps = 0
 
 	def set_visualization(self,vis):
 		self.visualization = vis
 
 	def tick(self):
-		delay = None
+		if not self.board_okay:
+			self.reset_board()
+		delay = 0
 		res = self.visualization.update(self.steps,time.time())
 		if type(res) is tuple:
 			state = res[0]
@@ -32,10 +33,26 @@ class MapController(object):
 		for w in writes:
 			w.color = adjust_brightness(w.color,BRIGHTNESS)
 		self.last_state = state
-		self.board.write(writes)
+		try:
+			self.board.write(writes)
+		except:
+			self.board_okay = False
 		if delay > 0:
 			time.sleep(delay)
 		self.steps += 1
+
+	def reset_board(self):
+		print 'reset'
+		self.board_okay = False
+		try:
+			self.board = ArduinoBridge()
+			time.sleep(2)
+			self.last_state = None
+			self.board_okay = True
+			print 'ready'
+		except:
+			print 'fail'
+			time.sleep(10)
 
 class Visualization(object):
 	def __init__(self):
@@ -46,6 +63,28 @@ class Visualization(object):
 
 	def update(self,tick=None,time=None):
 		return self.state
+
+
+class SleepyVisualization(Visualization):
+	def __init__(self):
+		self.tick_cycle = 50
+		self.selected = None
+
+	def update(self,tick,time):
+		s = MapState()
+		if tick % self.tick_cycle == 0:
+			selected_route = random.choice(ROUTES.keys())
+			selected_segment = random.choice(ROUTE_SEGMENTS[selected_route])
+			selected_light = random.randint(
+				selected_segment[1], selected_segment[2]
+			)
+			self.selected = (selected_route,selected_segment,selected_light)
+		(selected_route, selected_segment, selected_light) = self.selected
+		s.strips[selected_segment[0]][selected_light] = adjust_brightness(
+			ROUTE_COLORS[selected_route],
+			0.2 * abs(math.sin(math.pi * tick / self.tick_cycle))
+		)
+		return s
 
 class FlashVisualization(Visualization):
 	def update(self,tick,time):
@@ -59,6 +98,7 @@ class FlashVisualization(Visualization):
 				for i in xrange(len(s.strips[strip_name])):
 					s.strips[strip_name][i] = c
 		return (s,1)
+
 
 class FlashRouteVisualization(Visualization):
 	def update(self,tick,time):
@@ -81,20 +121,14 @@ class FlashRouteVisualization(Visualization):
 
 
 class RealTimeVisualization(Visualization):
-	def __init__(self):
+	def __init__(self,api_routes):
 		super(RealTimeVisualization,self).__init__()
-		api_stations = mbta.Stations()
-		api_routes = mbta.Routes(api_stations)
 		self.last_time_update = None
 		self.update_time = 10
 		self.routes = {}
-		self.black()
 		for route_name in ROUTES:
 			r = MapRoute(route_name,api_routes.get(route_name))
 			self.routes[route_name] = r
-
-	def black(self):
-		self.state = MapState()
 
 	def update(self,tick=None,time=None):
 		should_update = False
@@ -116,6 +150,7 @@ class MapRoute(object):
 		self.last_train_locations = {}
 		self.train_velocities = {}
 		self.last_locate_time = time.time()
+		self.update_lock = threading.Lock()
 		self.segments = map(
 			lambda m: LightSegment(*m),
 			ROUTE_SEGMENTS[name]
@@ -159,13 +194,17 @@ class MapRoute(object):
 			return (None,None)
 
 	def update_trains(self):
-		self.trains = {}
+		trains = {}
 		for t in self.route.get_trains():
-			self.trains[t.id] = t
+			trains[t.id] = t
+		self.update_lock.acquire()
+		self.trains = trains
 		self.locate_trains()
+		self.update_lock.release()
 
 	def nb_update_trains(self):
-		pass
+		update = threading.Thread(target=self.update_trains)
+		update.start()
 
 	def locate_trains(self,as_dict=False):
 		res_dict = {}
@@ -303,25 +342,26 @@ class BlinkRouteMapState(RouteMapState):
 			super(BlinkRouteMapState,self).__init__(routes,tick,should_update)
 			for name, mr in routes.iteritems():
 				if should_update:
-					mr.update_trains()
-					mr.locate_trains()
+					mr.nb_update_trains()
+				mr.update_lock.acquire()
 				for train_id in mr.train_locations:
 					location = int(mr.train_locations[train_id])
 					strip, ind = mr.strip_by_index(location)
+					t = mr.trains[train_id]
+					brightness = abs(math.sin(0.1 * (tick - location)))
+					if False and t.direction:
+						brightness = 1 - brightness
+					brightness = max(0.1,brightness)
 					color = adjust_brightness(
 						mr.color,
-						max(0.1,abs(math.cos(0.1 * (tick - ind))))
+						brightness
 					)
 					self.set_light_color(strip,ind,color)
-
-class TranserStationState(MapState):
-	def __init__(self,routes):
-		for name, mr in routes.iteritems():
-			pass
-
+				mr.update_lock.release()
 
 class StripWrite(object):
 	def __init__(self,index,start,end,color):
+		
 		self.index = index
 		self.start = start
 		self.end = end
@@ -344,10 +384,11 @@ class LightSegment(object):
 		return self.end - self.start + 1
 
 if __name__ == '__main__':
-	b = ArduinoBridge()
-	v = RealTimeVisualization()
-	c = MapController(b)
+	api_routes = mbta.Routes(mbta.Stations())
+	v = RealTimeVisualization(api_routes)
+	s = SleepyVisualization()
+	c = MapController()
 	c.set_visualization(v)
-	time.sleep(1)
 	while True:
+		print 'tick'
 		c.tick()

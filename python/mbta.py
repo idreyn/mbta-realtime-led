@@ -138,4 +138,3 @@ class Stations(object):
 			return False
 		else:
 			return station.location
-

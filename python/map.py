@@ -387,7 +387,8 @@ if __name__ == '__main__':
 	api_routes = mbta.Routes(mbta.Stations())
 	v = RealTimeVisualization(api_routes)
 	s = SleepyVisualization()
-	
+	f = FlashVisualization()
+	r = FlashRouteVisualization()
 	c = MapController()
 	c.set_visualization(v)
 	while True:

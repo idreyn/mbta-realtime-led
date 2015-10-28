@@ -5,6 +5,7 @@
 byte packet[PACKET_SIZE];
 int packet_index = 0;
 int total_bytes = 0;
+boolean is_running = 1;
 
 unsigned long last_data;
 
@@ -31,11 +32,6 @@ void setup() {
 void loop() {
   if(millis() - last_data > 2000) {
     packet_index = 0;
-  }
-  if(packet_index == 0) {
-    digitalWrite(13,LOW);
-  } else {
-    digitalWrite(13,HIGH);
   }
   while(Serial.available()) {
     byte b = Serial.read();

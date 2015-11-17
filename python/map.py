@@ -15,26 +15,29 @@ class MapController(object):
 	def __init__(self):
 		self.reset_board()
 		self.steps = 0
+		self.last_state = None
 
 	def set_visualization(self,vis):
+		self.steps = 0
 		self.visualization = vis
 
 	def tick(self):
 		if not self.board_okay:
 			self.reset_board()
 		delay = 0
+ 		t0 = time.time()
 		res = self.visualization.update(self.steps,time.time())
 		if type(res) is tuple:
 			state = res[0]
 			delay = res[1]
 		else:
 			state = res
-		writes = state.diff_with(self.last_state)
+		writes = state.diff_with(self.last_state or None)
 		for w in writes:
 			w.color = adjust_brightness(w.color,BRIGHTNESS)
 		self.last_state = state
 		try:
-			self.board.write(writes)
+			self.board.write(writes,time.time() - t0)
 		except:
 			self.board_okay = False
 		if delay > 0:
@@ -67,7 +70,7 @@ class Visualization(object):
 
 class SleepyVisualization(Visualization):
 	def __init__(self):
-		self.tick_cycle = 50
+		self.tick_cycle = 100
 		self.selected = None
 
 	def update(self,tick,time):
@@ -383,14 +386,4 @@ class LightSegment(object):
 	def length(self):
 		return self.end - self.start + 1
 
-if __name__ == '__main__':
-	api_routes = mbta.Routes(mbta.Stations())
-	v = RealTimeVisualization(api_routes)
-	s = SleepyVisualization()
-	f = FlashVisualization()
-	r = FlashRouteVisualization()
-	c = MapController()
-	c.set_visualization(v)
-	while True:
-		print 'tick'
-		c.tick()
+

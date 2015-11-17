@@ -121,7 +121,9 @@ class Stations(object):
 		self.stations['Government Center'] = govt_center
 		self.stations['Government Center'].lines = set(['Green','Blue'])
 		for route in API_ROUTE_NAMES.values():
-			stops = APIRequest.stops_by_route(route)['direction'][0]['stop']
+                        res = APIRequest.stops_by_route(route)
+                        # print res
+			stops = res['direction'][0]['stop']
 			for s in stops:
 				name = s['parent_station_name']
 				station = Station(name,(float(s['stop_lat']),float(s['stop_lon'])))

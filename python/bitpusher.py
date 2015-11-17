@@ -1,7 +1,7 @@
 import time
 import serial
 
-PORT = '/dev/ttyACM1'
+PORT = '/dev/ttyACM0'
 
 class ArduinoBridge(object):
     def __init__(self):

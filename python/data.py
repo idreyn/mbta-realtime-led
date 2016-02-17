@@ -4,8 +4,11 @@ class MapColors:
 	BLUE = 0x0000FF
 	ORANGE = 0xFFA500
 
-BRIGHTNESS = 0.2
-FADE_SIZE = 2
+BRIGHTNESS = 0.6
+FADE_SIZE = 1
+
+SLEEP_TIME = 0.03
+PORTS = ['/dev/ttyACM0','/dev/ttyACM1']
 
 API_ROUTE_NAMES = {
 	'red_a': 'Red',

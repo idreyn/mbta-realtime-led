@@ -1,7 +1,6 @@
 import time
 import serial
-
-PORTS = ['/dev/ttyACM0','/dev/ttyACM1']
+from data import *
 
 class ArduinoBridge(object):
     def __init__(self):
@@ -31,5 +30,5 @@ class ArduinoBridge(object):
         t0 = time.time()
         self.port.write(''.join(map(chr,out)))
         self.port.write(chr(0xFF))
-        sleep_time = 0.015
-        time.sleep(sleep_time)
+        time.sleep(SLEEP_TIME)
+

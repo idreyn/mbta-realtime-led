@@ -3,6 +3,7 @@ from datetime import *
 
 from mbta import Routes
 from map import *
+from data import *
 
 def is_on_time():
 	now = datetime.now()
@@ -28,6 +29,7 @@ def run():
 			else:
 				c.set_visualization(s)
 		c.tick()
+        # time.sleep(abs(SLEEP_TIME - elapsed))
 
 
 if __name__ == '__main__':

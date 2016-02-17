@@ -24,7 +24,6 @@ class MapController(object):
 	def tick(self):
 		if not self.board_okay:
 			self.reset_board()
-		delay = 0
  		t0 = time.time()
 		res = self.visualization.update(self.steps,time.time())
 		if type(res) is tuple:
@@ -41,8 +40,6 @@ class MapController(object):
 		except Exception, e:
 			print e
 			self.board_okay = False
-		if delay > 0:
-			time.sleep(delay)
 		self.steps += 1
 
 	def reset_board(self):

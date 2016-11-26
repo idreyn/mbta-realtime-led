@@ -1,2 +1,3 @@
 API_KEY.txt
-.pyc
+*.pyc
+venv/

@@ -4,11 +4,11 @@ class MapColors:
     BLUE = 0x0000FF
     ORANGE = 0xFFA500
 
-BRIGHTNESS = 0.6
-FADE_SIZE = 1
+BRIGHTNESS = 0.3
+FADE_SIZE = 3
 
-SLEEP_TIME = 0.03
-PORTS = ['/dev/ttyACM0', '/dev/ttyACM1']
+SLEEP_TIME = 0.08
+PORTS = ['/dev/tty.usbmodem1411', '/dev/tty.usbmodem1421'] #['/dev/ttyACM0', '/dev/ttyACM1']
 
 API_ROUTE_NAMES = {
     'red_a': 'Red',

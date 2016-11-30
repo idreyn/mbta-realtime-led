@@ -4,7 +4,6 @@ from data import *
 
 
 class ArduinoBridge(object):
-
     def __init__(self):
         for port in PORTS:
             try:
@@ -32,4 +31,4 @@ class ArduinoBridge(object):
         t0 = time.time()
         self.port.write(''.join(map(chr, out)))
         self.port.write(chr(0xFF))
-        time.sleep(SLEEP_TIME)
+        time.sleep(SLEEP_TIME - (time.time() - t0))

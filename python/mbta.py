@@ -27,7 +27,6 @@ class APIRequest(object):
 
 
 class Route(object):
-
     def __init__(self, stations, name, api_name=None, train_filter=None):
         self.name = name
         self.api_name = api_name or name
@@ -47,7 +46,6 @@ class Route(object):
             for trip in direction['trip']:
                 trains.append(Train(
                     trip['trip_name'],
-                    trip['trip_headsign'],
                     trip['trip_id'],
                     (
                         float(trip['vehicle']['vehicle_lat']),
@@ -79,7 +77,6 @@ class Route(object):
 
 
 class Routes(object):
-
     def __init__(self, stations):
         self.routes = {}
         for k in API_ROUTE_NAMES:
@@ -96,10 +93,8 @@ class Routes(object):
 
 
 class Train(object):
-
-    def __init__(self, name, headsign, id, location, direction, timestamp):
+    def __init__(self, name, id, location, direction, timestamp):
         self.name = name
-        self.headsign = headsign
         self.id = id
         self.location = location
         self.direction = direction
@@ -110,7 +105,6 @@ class Train(object):
 
 
 class Station(object):
-
     def __init__(self, name, location):
         self.lines = set()
         self.name = name
@@ -124,7 +118,6 @@ class Station(object):
 
 
 class Stations(object):
-
     def __init__(self):
         self.stations = {}
         govt_center = Station('Government Center', (42.359444, -71.059444))

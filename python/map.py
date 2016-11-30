@@ -13,7 +13,6 @@ from bitpusher import *
 
 
 class MapController(object):
-
     def __init__(self):
         self.reset_board()
         self.steps = 0
@@ -59,7 +58,6 @@ class MapController(object):
 
 
 class Visualization(object):
-
     def __init__(self):
         pass
 
@@ -71,7 +69,6 @@ class Visualization(object):
 
 
 class SleepyVisualization(Visualization):
-
     def __init__(self):
         self.tick_cycle = 100
         self.selected = None
@@ -94,7 +91,6 @@ class SleepyVisualization(Visualization):
 
 
 class FlashVisualization(Visualization):
-
     def update(self, tick, time):
         s = MapState()
         c = adjust_brightness(
@@ -110,7 +106,6 @@ class FlashVisualization(Visualization):
 
 
 class FlashRouteVisualization(Visualization):
-
     def update(self, tick, time):
         s = MapState()
         keys = sorted(ROUTES.keys())
@@ -131,7 +126,6 @@ class FlashRouteVisualization(Visualization):
 
 
 class RealTimeVisualization(Visualization):
-
     def __init__(self, api_routes):
         super(RealTimeVisualization, self).__init__()
         self.last_time_update = None
@@ -151,7 +145,6 @@ class RealTimeVisualization(Visualization):
 
 
 class MapRoute(object):
-
     def __init__(self, name, route):
         self.name = name
         self.route = route
@@ -232,15 +225,6 @@ class MapRoute(object):
             loc = start + frac
             ind = int(loc)
             self.train_locations[t.id] = loc
-            if self.last_train_locations and self.last_train_locations.get(t.id):
-                avg = (
-                    loc - self.last_train_locations[t.id]) / self.elapsed_since_last_location()
-                n = 1
-                if self.train_velocities.get(t.id):
-                    n, current = self.train_velocities[t.id]
-                    n = n + 1
-                    avg = (1. / n) * ((n - 1) * current + avg)
-                self.train_velocities[t.id] = (n, avg)
             if not res_dict.get(ind):
                 res_dict[ind] = []
             res_dict[ind].append(t)
@@ -280,7 +264,6 @@ class MapRoute(object):
 
 
 class MapState(object):
-
     def __init__(self):
         self.strips = {}
         for name, (index, length) in STRIPS.iteritems():
@@ -312,7 +295,6 @@ class MapState(object):
 
 
 class RouteMapState(MapState):
-
     def __init__(self, routes, tick, should_update=False):
         super(RouteMapState, self).__init__()
         for route_name in ROUTE_SEGMENTS:
@@ -325,7 +307,6 @@ class RouteMapState(MapState):
 
 
 class FadeRouteMapState(RouteMapState):
-
     def __init__(self, routes, tick, should_update=False):
         super(FadeRouteMapState, self).__init__(routes, tick, should_update)
         for name, mr in routes.iteritems():
@@ -360,7 +341,6 @@ class FadeRouteMapState(RouteMapState):
 
 
 class BlinkRouteMapState(RouteMapState):
-
     def __init__(self, routes, tick, should_update=False):
         super(BlinkRouteMapState, self).__init__(routes, tick, should_update)
         for name, mr in routes.iteritems():
@@ -371,20 +351,13 @@ class BlinkRouteMapState(RouteMapState):
                 location = int(mr.train_locations[train_id])
                 strip, ind = mr.strip_by_index(location)
                 t = mr.trains[train_id]
-                brightness = abs(math.sin(0.1 * (tick - location)))
-                if False and t.direction:
-                    brightness = 1 - brightness
-                brightness = max(0.1, brightness)
-                color = adjust_brightness(
-                    mr.color,
-                    brightness
-                )
+                brightness = max(0.1, abs(math.sin(0.1 * (tick - location))))
+                color = adjust_brightness(mr.color, brightness)
                 self.set_light_color(strip, ind, color)
             mr.update_lock.release()
 
 
 class StripWrite(object):
-
     def __init__(self, index, start, end, color):
         self.index = index
         self.start = start
@@ -399,7 +372,6 @@ class StripWrite(object):
 
 
 class LightSegment(object):
-
     def __init__(self, strip, start, end, reverse=False):
         self.strip = strip
         self.start = start

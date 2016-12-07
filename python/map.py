@@ -16,7 +16,11 @@ class MapController(object):
     def __init__(self):
         self.reset_board()
         self.steps = 0
+        self.brightness = BRIGHTNESS
         self.last_state = None
+
+    def set_brightness(self, b):
+        self.brightness = b
 
     def set_visualization(self, vis):
         self.steps = 0
@@ -34,7 +38,7 @@ class MapController(object):
             state = res
         writes = state.diff_with(self.last_state or None)
         for w in writes:
-            w.color = adjust_brightness(w.color, BRIGHTNESS)
+            w.color = adjust_brightness(w.color, self.brightness)
         self.last_state = state
         try:
             self.board.write(writes, time.time() - t0)

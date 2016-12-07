@@ -1,3 +1,8 @@
 API_KEY.txt
 *.pyc
-venv/
+*.swk
+*.swm
+*.swn
+*.swo
+venv
+/

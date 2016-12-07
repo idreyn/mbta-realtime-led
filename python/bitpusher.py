@@ -8,7 +8,7 @@ class ArduinoBridge(object):
         for port in PORTS:
             try:
                 print 'connecting to', port
-                self.port = serial.Serial(port, 115200)
+                self.port = serial.Serial(port, 115200, rtscts=True, dsrdtr=True)
             except:
                 print 'failed to connect'
                 continue
@@ -31,4 +31,4 @@ class ArduinoBridge(object):
         t0 = time.time()
         self.port.write(''.join(map(chr, out)))
         self.port.write(chr(0xFF))
-        time.sleep(SLEEP_TIME - (time.time() - t0))
+        time.sleep(SLEEP_TIME)

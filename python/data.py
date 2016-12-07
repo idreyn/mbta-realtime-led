@@ -4,11 +4,22 @@ class MapColors:
     BLUE = 0x0000FF
     ORANGE = 0xFFA500
 
-BRIGHTNESS = 0.3
-FADE_SIZE = 3
+BRIGHTNESS_MULTIPLIERS = {
+        MapColors.RED: 1,
+        MapColors.ORANGE: 0.75,
+        MapColors.BLUE: 0.5,
+        MapColors.GREEN: 0.5
+}
 
-SLEEP_TIME = 0.08
-PORTS = ['/dev/tty.usbmodem1411', '/dev/tty.usbmodem1421'] #['/dev/ttyACM0', '/dev/ttyACM1']
+BRIGHTNESS = 0.3
+FADE_SIZE = 1
+FADE_GRANULARITY = 0.1
+
+SLEEP_TIME = 0.015
+PORTS = ['/dev/ttyACM0', '/dev/ttyACM1']
+
+ON_HOUR = 8
+OFF_HOUR = 24
 
 API_ROUTE_NAMES = {
     'red_a': 'Red',

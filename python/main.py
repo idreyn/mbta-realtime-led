@@ -8,7 +8,7 @@ from data import *
 
 def is_on_time():
     now = datetime.now()
-    return now.hour >= 7 and now.hour <= 22
+    return now.hour >= ON_HOUR and now.hour < OFF_HOUR
 
 
 def x_is_on_time():
@@ -22,6 +22,7 @@ def run():
     s = SleepyVisualization()
     f = FlashVisualization()
     r = FlashRouteVisualization()
+    s = SlideRouteVisualization()
     c = MapController()
     while True:
         prev_is_on = is_on

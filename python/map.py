@@ -71,12 +71,13 @@ class Visualization(object):
 class SleepyVisualization(Visualization):
     def __init__(self):
         self.tick_cycle = 100
-        self.selected = None
+        self.selected_segment = None
 
     def update(self, tick, time):
         s = MapState()
         if tick % self.tick_cycle == 0:
             selected_route = random.choice(ROUTES.keys())
+
             selected_segment = random.choice(ROUTE_SEGMENTS[selected_route])
             selected_light = random.randint(
                 selected_segment[1], selected_segment[2]
@@ -109,19 +110,32 @@ class FlashRouteVisualization(Visualization):
     def update(self, tick, time):
         s = MapState()
         keys = sorted(ROUTES.keys())
-        bright_route_name = keys[tick % len(keys)]
-        for route_name in ROUTES:
-            c = ROUTE_COLORS[route_name]
-            c = adjust_brightness(c, 0.1)
-            for seg in ROUTE_SEGMENTS[route_name]:
-                (strip, start, end) = seg[0:3]
-                for i in xrange(start, end+1):
-                    s.strips[strip][i] = c
+        bright_route_name = keys[tick % len(keys)] 
         c = ROUTE_COLORS[bright_route_name]
         for seg in ROUTE_SEGMENTS[bright_route_name]:
             (strip, start, end) = seg[0:3]
             for i in xrange(start, end+1):
                 s.strips[strip][i] = c
+        return (s, 1)
+
+class SlideRouteVisualization(Visualization):
+    def __init__(self):
+        self.route_ticks = 150
+
+    def update(self, tick, time):
+        subtick = tick % self.route_ticks
+        s = MapState()
+        keys = sorted(ROUTES.keys())
+        bright_route_name = keys[(tick / self.route_ticks) % len(keys)]
+        c = ROUTE_COLORS[bright_route_name]
+        brightness = 0.05 * BRIGHTNESS_MULTIPLIERS[c]
+        j = 0
+        for seg in ROUTE_SEGMENTS[bright_route_name]:
+            (strip, start, end, rev) = seg[0:4]
+            rng = xrange(end, start - 1, -1) if rev else xrange(start, end + 1)
+            for i in rng:
+                s.strips[strip][i] = adjust_brightness(c, brightness * (1 - min(1, float(abs(j - subtick)) / 10)))
+                j = j + 1
         return (s, 1)
 
 
@@ -328,7 +342,7 @@ class FadeRouteMapState(RouteMapState):
                     )
                 )
                 for r_ind, brightness in lights:
-                    brightness = max(0.1, util.snap_to(brightness, 0.05))
+                    brightness = max(0.1, util.snap_to(brightness, FADE_GRANULARITY))
                     strip, s_ind = mr.strip_by_index(r_ind)
                     if strip != None:
                         self.set_light_color(

@@ -21,10 +21,14 @@ class MapController(object):
 
     def set_brightness(self, b):
         self.brightness = b
+        self.invalidate()
 
     def set_visualization(self, vis):
         self.steps = 0
         self.visualization = vis
+
+    def invalidate(self):
+        self.last_state = None
 
     def tick(self):
         if not self.board_okay:

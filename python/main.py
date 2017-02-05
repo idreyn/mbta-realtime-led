@@ -22,10 +22,11 @@ modes["off"] = modes["SlideVisualization"]
 modes["sleep"] = modes["SlideVisualization"]
 
 def wake():
+    ctrl.set_brightness(0.1)
     set_mode("on")
 
 def sleep():
-    ctrl.set_brightness(BRIGHTNESS)
+    ctrl.set_brightness(0.3)
     set_mode("sleep")
  
 def is_on_time():

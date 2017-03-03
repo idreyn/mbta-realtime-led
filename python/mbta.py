@@ -82,7 +82,7 @@ class Routes(object):
         for k in API_ROUTE_NAMES:
             self.routes[k] = Route(stations, k, API_ROUTE_NAMES[k])
         for k in API_ROUTE_FILTERS:
-            self.routes[k].train_filter = API_ROUTE_FILTERS[k]
+            self.routes[k].train_filter = API_ROUTE_FILTERS[k] 
 
     def all(self):
         for k in self.routes:

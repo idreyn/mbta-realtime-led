@@ -156,7 +156,7 @@ ROUTES = {
         'Copley',
         'Hynes Convention Center',
         'Kenmore',
-        'Saint Mary Street',
+        'Saint Marys Street',
         'Hawes Street',
         'Kent Street',
         'Saint Paul Street',
@@ -266,7 +266,7 @@ STATION_LOCATIONS = {
         ('Park Street', 18),
         ('Copley', 29),
         ('Kenmore', 37),
-        ('Saint Mary Street', 45),
+        ('Saint Marys Street', 45),
         ('Cleveland Circle', 75)
     ],
     'green_d': [

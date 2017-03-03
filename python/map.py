@@ -148,8 +148,9 @@ class SlideRouteVisualization(Visualization):
 
 
 class RealTimeVisualization(Visualization):
-    def __init__(self, api_routes):
+    def __init__(self):
         super(RealTimeVisualization, self).__init__()
+        api_routes = mbta.Routes(mbta.Stations())
         self.last_time_update = None
         self.update_time = 10
         self.routes = {}
@@ -193,7 +194,7 @@ class MapRoute(object):
 
     def distribute_stations(self):
         station_references = STATION_LOCATIONS[self.name]
-        for a, b in pairwise(station_references):
+        for a, b in pairwise(station_references): 
             list = collect_between(
                 self.route.stations,
                 lambda x: x.name == a[0],

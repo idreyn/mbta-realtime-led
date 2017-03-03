@@ -3,7 +3,6 @@ from datetime import *
 
 import schedule
 
-from mbta import Routes
 from map import *
 from data import *
 from server import setup
@@ -11,7 +10,7 @@ from server import setup
 ctrl = MapController()
 
 modes = {
-    "RealTimeVisualization": RealTimeVisualization(Routes(mbta.Stations())),
+    "RealTimeVisualization": RealTimeVisualization(),
     "SleepyVisualization": SleepyVisualization(),
     "SlideVisualization": SlideRouteVisualization()
 }
@@ -19,15 +18,14 @@ modes = {
 # aliases
 modes["on"] = modes["RealTimeVisualization"]
 modes["off"] = modes["SlideVisualization"]
-modes["sleep"] = modes["SlideVisualization"]
 
-def wake():
-    ctrl.set_brightness(0.1)
+brightness = {"on": 0.1, "off": 0.3}
+
+def wake(): 
     set_mode("on")
 
-def sleep():
-    ctrl.set_brightness(0.3)
-    set_mode("sleep")
+def sleep(): 
+    set_mode("off")
  
 def is_on_time():
     now = datetime.now()
@@ -36,6 +34,7 @@ def is_on_time():
 def set_mode(m):
     if modes.get(m):
         ctrl.set_visualization(modes.get(m))
+        ctrl.set_brightness(brightness.get(m, 0.1))
         return True
     return False
 

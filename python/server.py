@@ -1,7 +1,7 @@
 import thread
 
 from data import *
-from flask import Flask
+from flask import Flask, make_response
 app = Flask(__name__)
 
 def run():
@@ -25,4 +25,11 @@ def toggle(state):
 @app.route("/brightness/<level>")
 def brightness(level):
     return str(brightness_cb(level)).lower()
+
+@app.route("/robots.txt")
+def no_robots():
+    nope = "User-agent: *\nDisallow: /"
+    resp = make_response(nope)
+    resp.headers['Content-type'] = 'text/plain'
+    return resp
 

@@ -50,6 +50,7 @@ def clock_output():
         time.sleep(1)
         print int(len(data) / (time.time() - start_time)), 'Bps'
 
+
 if __name__ == '__main__':
     read_lock = threading.Lock()
     read = threading.Thread(target=read_input, args=(ser, read_lock))

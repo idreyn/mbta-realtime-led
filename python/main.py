@@ -21,15 +21,19 @@ modes["off"] = modes["SlideVisualization"]
 
 brightness = {"on": 0.1, "off": 0.3}
 
-def wake(): 
+
+def wake():
     set_mode("on")
 
-def sleep(): 
+
+def sleep():
     set_mode("off")
- 
+
+
 def is_on_time():
     now = datetime.now()
     return now.hour >= ON_HOUR and now.hour < OFF_HOUR
+
 
 def set_mode(m):
     if modes.get(m):
@@ -38,13 +42,15 @@ def set_mode(m):
         return True
     return False
 
+
 def set_brightness(b):
-    b = max(min(float(b) / 100,  1), 0)
+    b = max(min(float(b) / 100, 1), 0)
     ctrl.set_brightness(b)
     ctrl.reset_board()
     return b
 
-def run(): 
+
+def run():
     schedule.every().day.at("%s:00" % (ON_HOUR % 24)).do(wake)
     schedule.every().day.at("%s:00" % (OFF_HOUR % 24)).do(sleep)
     setup(set_mode, set_brightness)
@@ -55,6 +61,7 @@ def run():
     while True:
         schedule.run_pending()
         ctrl.tick()
+
 
 if __name__ == '__main__':
     run()

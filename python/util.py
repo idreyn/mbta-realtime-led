@@ -10,7 +10,7 @@ def read(filename):
 
 def pairwise(list):
     for i in xrange(0, len(list) - 1):
-        yield list[i], list[i+1]
+        yield list[i], list[i + 1]
 
 
 def both(a, b):
@@ -83,7 +83,7 @@ def fancy_time_diff(this, that=None):
                 # Now the same
                 same_t = True
                 time_diffs.append(
-                    (diff_start_t, i-1)
+                    (diff_start_t, i - 1)
                 )
         else:
             if same_t:
@@ -99,7 +99,7 @@ def fancy_time_diff(this, that=None):
         color = this[start]
         last_switch = start
         for i in xrange(start + 1, end + 1):
-            if this[i] != this[i-1]:
+            if this[i] != this[i - 1]:
                 instr.append((
                     last_switch,
                     i - 1,

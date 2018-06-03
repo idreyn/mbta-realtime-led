@@ -60,9 +60,12 @@ class Route(object):
 
     def locate_train(self, train):
         between = min(
-            pairwise(self.stations),
-            key=lambda (a, b): point_line_segment_distance(a.location, b.location, train.location)
-        )
+            pairwise(
+                self.stations),
+            key=lambda a_b: point_line_segment_distance(
+                a_b[0].location,
+                a_b[1].location,
+                train.location))
         progress = point_distance(
             train.location,
             between[0].location
@@ -82,7 +85,7 @@ class Routes(object):
         for k in API_ROUTE_NAMES:
             self.routes[k] = Route(stations, k, API_ROUTE_NAMES[k])
         for k in API_ROUTE_FILTERS:
-            self.routes[k].train_filter = API_ROUTE_FILTERS[k] 
+            self.routes[k].train_filter = API_ROUTE_FILTERS[k]
 
     def all(self):
         for k in self.routes:

@@ -4,11 +4,12 @@ class MapColors:
     BLUE = 0x0000FF
     ORANGE = 0xFFA500
 
+
 BRIGHTNESS_MULTIPLIERS = {
-        MapColors.RED: 1,
-        MapColors.ORANGE: 0.75,
-        MapColors.BLUE: 0.5,
-        MapColors.GREEN: 0.5
+    MapColors.RED: 1,
+    MapColors.ORANGE: 0.75,
+    MapColors.BLUE: 0.5,
+    MapColors.GREEN: 0.5
 }
 
 BRIGHTNESS = 0.3

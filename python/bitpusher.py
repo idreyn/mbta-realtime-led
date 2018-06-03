@@ -8,8 +8,9 @@ class ArduinoBridge(object):
         for port in PORTS:
             try:
                 print 'connecting to', port
-                self.port = serial.Serial(port, 115200, rtscts=True, dsrdtr=True)
-            except:
+                self.port = serial.Serial(
+                    port, 115200, rtscts=True, dsrdtr=True)
+            except BaseException:
                 print 'failed to connect'
                 continue
             break

@@ -35,7 +35,7 @@ class MapController(object):
             self.reset_board()
         t0 = time.time()
         res = self.visualization.update(self.steps, time.time())
-        if type(res) is tuple:
+        if isinstance(res, tuple):
             state = res[0]
             delay = res[1]
         else:
@@ -46,7 +46,7 @@ class MapController(object):
         self.last_state = state
         try:
             self.board.write(writes, time.time() - t0)
-        except Exception, e:
+        except Exception as e:
             print e
             self.board_okay = False
         self.steps += 1
@@ -60,7 +60,7 @@ class MapController(object):
             self.last_state = None
             self.board_okay = True
             print 'ready'
-        except:
+        except BaseException:
             print 'fail'
             time.sleep(10)
 
@@ -118,13 +118,14 @@ class FlashRouteVisualization(Visualization):
     def update(self, tick, time):
         s = MapState()
         keys = sorted(ROUTES.keys())
-        bright_route_name = keys[tick % len(keys)] 
+        bright_route_name = keys[tick % len(keys)]
         c = ROUTE_COLORS[bright_route_name]
         for seg in ROUTE_SEGMENTS[bright_route_name]:
             (strip, start, end) = seg[0:3]
-            for i in xrange(start, end+1):
+            for i in xrange(start, end + 1):
                 s.strips[strip][i] = c
         return (s, 1)
+
 
 class SlideRouteVisualization(Visualization):
     def __init__(self):
@@ -142,7 +143,8 @@ class SlideRouteVisualization(Visualization):
             (strip, start, end, rev) = seg[0:4]
             rng = xrange(end, start - 1, -1) if rev else xrange(start, end + 1)
             for i in rng:
-                s.strips[strip][i] = adjust_brightness(c, brightness * (1 - min(1, float(abs(j - subtick)) / 10)))
+                s.strips[strip][i] = adjust_brightness(
+                    c, brightness * (1 - min(1, float(abs(j - subtick)) / 10)))
                 j = j + 1
         return (s, 1)
 
@@ -160,7 +162,10 @@ class RealTimeVisualization(Visualization):
 
     def update(self, tick=None, time=None):
         should_update = False
-        if not self.last_time_update or time - self.last_time_update > self.update_time:
+        if (
+            not self.last_time_update or 
+            time - self.last_time_update > self.update_time
+        ):
             self.last_time_update = time
             should_update = True
         self.state = BlinkRouteMapState(self.routes, tick, should_update)
@@ -194,7 +199,7 @@ class MapRoute(object):
 
     def distribute_stations(self):
         station_references = STATION_LOCATIONS[self.name]
-        for a, b in pairwise(station_references): 
+        for a, b in pairwise(station_references):
             list = collect_between(
                 self.route.stations,
                 lambda x: x.name == a[0],
@@ -313,7 +318,7 @@ class MapState(object):
 
     def set_segment_color(self, strip, start, end, color):
         if self.strips.get(strip):
-            for i in xrange(start, end+1):
+            for i in xrange(start, end + 1):
                 self.set_light_color(strip, i, color)
 
 
@@ -351,9 +356,11 @@ class FadeRouteMapState(RouteMapState):
                     )
                 )
                 for r_ind, brightness in lights:
-                    brightness = max(0.1, util.snap_to(brightness, FADE_GRANULARITY))
+                    brightness = max(
+                        0.1, util.snap_to(
+                            brightness, FADE_GRANULARITY))
                     strip, s_ind = mr.strip_by_index(r_ind)
-                    if strip != None:
+                    if strip is not None:
                         self.set_light_color(
                             strip,
                             s_ind, adjust_brightness(
@@ -391,7 +398,12 @@ class StripWrite(object):
         return str((self.index, self.start, self.end, self.color))
 
     def __eq__(self, other):
-        return self.index == other.index and self.start == other.start and self.end == other.end and self.color == other.color
+        return (
+            self.index == other.index and 
+            self.start == other.start and 
+            self.end == other.end and 
+            self.color == other.color
+        )
 
 
 class LightSegment(object):
